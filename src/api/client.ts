@@ -40,6 +40,10 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    const locale = (i18n.global.locale as any).value || i18n.global.locale
+    if (locale) {
+      config.headers['X-Lang'] = locale
+    }
     const token = localStorage.getItem('admin_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
