@@ -28,6 +28,9 @@ import type {
   AdminAffiliateUser,
   AdminAffiliateCommission,
   AdminAffiliateWithdraw,
+  AdminTelegramBotRuntimeStatus,
+  AdminTelegramBroadcast,
+  AdminTelegramBroadcastUser,
 } from './types'
 
 export interface CaptchaPayload {
@@ -408,5 +411,18 @@ export const adminAPI = {
   // Telegram Bot Settings
   getTelegramBotSettings: () => api.get<ApiResponse>('/admin/settings/telegram-bot'),
   updateTelegramBotSettings: (data: Record<string, unknown>) => api.put<ApiResponse>('/admin/settings/telegram-bot', data),
-  getTelegramBotRuntimeStatus: () => api.get<ApiResponse>('/admin/settings/telegram-bot/runtime-status'),
+  getTelegramBotRuntimeStatus: () => api.get<ApiResponse<AdminTelegramBotRuntimeStatus>>('/admin/settings/telegram-bot/runtime-status'),
+  getTelegramBroadcasts: (params?: Record<string, unknown>) =>
+    api.get<ApiResponse<AdminTelegramBroadcast[]>>('/admin/telegram-bot/broadcasts', { params }),
+  createTelegramBroadcast: (data: {
+    title: string
+    recipient_type: string
+    user_ids?: number[]
+    filters?: Record<string, unknown>
+    attachment_url?: string
+    attachment_name?: string
+    message_html: string
+  }) => api.post<ApiResponse<AdminTelegramBroadcast>>('/admin/telegram-bot/broadcasts', data),
+  getTelegramBroadcastUsers: (params?: Record<string, unknown>) =>
+    api.get<ApiResponse<AdminTelegramBroadcastUser[]>>('/admin/telegram-bot/users', { params }),
 }

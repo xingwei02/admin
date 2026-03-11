@@ -37,6 +37,7 @@ import {
   Lock,
   Bot,
   Wifi,
+  Send,
 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -316,6 +317,12 @@ const navGroups = computed<NavGroup[]>(() => {
           to: '/telegram-bot/channel-clients',
           icon: KeyRound,
           permission: 'GET:/admin/channel-clients',
+        },
+        {
+          label: t('admin.navItems.telegramBotBroadcasts'),
+          to: '/telegram-bot/broadcasts',
+          icon: Send,
+          permission: 'GET:/admin/telegram-bot/broadcasts',
         },
       ],
     },

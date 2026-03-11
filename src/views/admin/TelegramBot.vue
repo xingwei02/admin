@@ -2,16 +2,17 @@
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
+import type { AdminTelegramBotRuntimeStatus } from '@/api/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { formatDate } from '@/utils/format'
-import { Bot, ExternalLink, Wifi, WifiOff, RefreshCw } from 'lucide-vue-next'
+import { Bot, ExternalLink, Wifi, WifiOff, RefreshCw, Send } from 'lucide-vue-next'
 
 const { t } = useI18n()
 
 const loading = ref(false)
-const runtimeStatus = ref<Record<string, unknown> | null>(null)
+const runtimeStatus = ref<AdminTelegramBotRuntimeStatus | null>(null)
 
 const isConnected = computed(() => {
   if (!runtimeStatus.value) return false
@@ -22,8 +23,7 @@ const fetchRuntimeStatus = async () => {
   loading.value = true
   try {
     const res = await adminAPI.getTelegramBotRuntimeStatus()
-    const data = res.data?.data
-    runtimeStatus.value = data && typeof data === 'object' ? (data as Record<string, unknown>) : null
+    runtimeStatus.value = res.data?.data ?? null
   } catch {
     runtimeStatus.value = null
   } finally {
@@ -36,8 +36,8 @@ const formatRuntimeDate = (value: unknown) => {
   return formatDate(value) || '-'
 }
 
-const formatWebhookStatus = (value: unknown) => {
-  if (typeof value !== 'string' || !value) return '-'
+const formatWebhookStatus = (value?: string) => {
+  if (!value) return '-'
   const normalized = value.trim().toLowerCase()
   if (['active', 'enabled', 'connected', 'ok'].includes(normalized)) {
     return t('telegramBot.status.webhookStatusActive')
@@ -46,6 +46,33 @@ const formatWebhookStatus = (value: unknown) => {
     return t('telegramBot.status.webhookStatusInactive')
   }
   return value
+}
+
+const formatLicenseStatus = (value?: string) => {
+  if (!value) return t('telegramBot.status.licenseStatusUnknown')
+  const normalized = value.trim().toLowerCase()
+  if (normalized === 'active') return t('telegramBot.status.licenseStatusActive')
+  if (normalized === 'expired') return t('telegramBot.status.licenseStatusExpired')
+  if (normalized === 'revoked') return t('telegramBot.status.licenseStatusRevoked')
+  if (normalized === 'suspended') return t('telegramBot.status.licenseStatusSuspended')
+  if (normalized === 'inactive') return t('telegramBot.status.licenseStatusInactive')
+  return value
+}
+
+const formatWarnings = (warnings?: string[]) => {
+  if (!warnings?.length) return t('telegramBot.status.licenseWarningsEmpty')
+  return warnings
+    .map((warning) => {
+      const normalized = warning.trim().toLowerCase()
+      if (normalized === 'license_lease_expiring_soon') {
+        return t('telegramBot.status.warningLeaseExpiringSoon')
+      }
+      if (normalized === 'license_lease_expired') {
+        return t('telegramBot.status.warningLeaseExpired')
+      }
+      return warning
+    })
+    .join(' / ')
 }
 
 onMounted(() => {
@@ -78,7 +105,7 @@ onMounted(() => {
         </div>
       </CardHeader>
       <CardContent>
-        <div v-if="isConnected && runtimeStatus" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div v-if="isConnected && runtimeStatus" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           <div>
             <p class="text-sm text-muted-foreground">{{ t('telegramBot.status.botVersion') }}</p>
             <p class="text-sm font-medium">{{ runtimeStatus.bot_version || '-' }}</p>
@@ -95,6 +122,22 @@ onMounted(() => {
             <p class="text-sm text-muted-foreground">{{ t('telegramBot.status.configVersion') }}</p>
             <p class="text-sm font-medium">{{ runtimeStatus.config_version ?? '-' }}</p>
           </div>
+          <div>
+            <p class="text-sm text-muted-foreground">{{ t('telegramBot.status.machineCode') }}</p>
+            <p class="text-sm font-medium break-all font-mono">{{ runtimeStatus.machine_code || '-' }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-muted-foreground">{{ t('telegramBot.status.licenseStatusLabel') }}</p>
+            <p class="text-sm font-medium">{{ formatLicenseStatus(runtimeStatus.license_status) }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-muted-foreground">{{ t('telegramBot.status.licenseExpiresAt') }}</p>
+            <p class="text-sm font-medium">{{ formatRuntimeDate(runtimeStatus.license_expires_at) }}</p>
+          </div>
+          <div class="md:col-span-2 xl:col-span-3">
+            <p class="text-sm text-muted-foreground">{{ t('telegramBot.status.licenseWarnings') }}</p>
+            <p class="text-sm font-medium">{{ formatWarnings(runtimeStatus.warnings) }}</p>
+          </div>
         </div>
         <div v-else class="rounded-lg border border-dashed p-6 text-center">
           <WifiOff class="h-10 w-10 mx-auto text-muted-foreground mb-3" />
@@ -105,7 +148,7 @@ onMounted(() => {
     </Card>
 
     <!-- Feature Overview -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <Card>
         <CardHeader>
           <CardTitle class="text-base">{{ t('telegramBot.overview.featureBasicSettings') }}</CardTitle>
@@ -148,6 +191,20 @@ onMounted(() => {
           </Button>
         </CardContent>
       </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle class="text-base">{{ t('telegramBot.overview.featureBroadcasts') }}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p class="text-sm text-muted-foreground">{{ t('telegramBot.overview.featureBroadcastsDesc') }}</p>
+          <Button variant="link" class="px-0 mt-2" as-child>
+            <RouterLink to="/telegram-bot/broadcasts">
+              {{ t('telegramBot.overview.goToBroadcasts') }}
+              <ExternalLink class="h-3 w-3 ml-1" />
+            </RouterLink>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
 
     <!-- Quick Actions -->
@@ -159,6 +216,12 @@ onMounted(() => {
         <Button variant="outline" size="sm" :disabled="loading" @click="fetchRuntimeStatus">
           <RefreshCw class="h-4 w-4 mr-2" :class="{ 'animate-spin': loading }" />
           {{ t('telegramBot.overview.refreshStatus') }}
+        </Button>
+        <Button variant="outline" size="sm" as-child>
+          <RouterLink to="/telegram-bot/broadcasts/create">
+            <Send class="h-4 w-4 mr-2" />
+            {{ t('telegramBot.overview.createBroadcast') }}
+          </RouterLink>
         </Button>
       </CardContent>
     </Card>

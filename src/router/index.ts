@@ -214,6 +214,18 @@ const routes = [
         component: () => import('@/views/admin/TelegramBotChannelClients.vue'),
         meta: { permission: 'GET:/admin/channel-clients' },
       },
+      {
+        path: 'telegram-bot/broadcasts',
+        name: 'telegram-bot-broadcasts',
+        component: () => import('@/views/admin/TelegramBotBroadcasts.vue'),
+        meta: { permission: 'GET:/admin/telegram-bot/broadcasts' },
+      },
+      {
+        path: 'telegram-bot/broadcasts/create',
+        name: 'telegram-bot-broadcast-create',
+        component: () => import('@/views/admin/TelegramBotBroadcastCreate.vue'),
+        meta: { permission: 'GET:/admin/telegram-bot/broadcasts' },
+      },
     ],
   },
 ]

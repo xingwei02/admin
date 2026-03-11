@@ -255,6 +255,48 @@ export interface AdminBanner {
   updated_at: string
 }
 
+export interface AdminTelegramBotRuntimeStatus {
+  connected: boolean
+  last_seen_at?: string
+  bot_version?: string
+  webhook_status?: string
+  machine_code?: string
+  license_status?: string
+  license_expires_at?: string
+  warnings?: string[]
+  config_version: number
+  last_config_sync_at?: string
+}
+
+export interface AdminTelegramBroadcast {
+  id: number
+  title: string
+  recipient_type: string
+  filters?: Record<string, unknown>
+  recipient_count: number
+  success_count: number
+  failed_count: number
+  status: string
+  message_html: string
+  attachment_url?: string
+  attachment_name?: string
+  started_at?: string
+  completed_at?: string
+  last_error?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminTelegramBroadcastUser {
+  user_id: number
+  display_name: string
+  user_email: string
+  telegram_username: string
+  telegram_user_id: string
+  bound_at: string
+  user_created_at: string
+}
+
 // --- Post ---
 export interface AdminPost {
   id: number
