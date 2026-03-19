@@ -548,7 +548,7 @@ watch(
       </button>
     </div>
 
-    <div v-if="activeTab === 'orders'" class="rounded-xl border border-border bg-card">
+    <div v-if="activeTab === 'orders'" class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
@@ -628,7 +628,7 @@ watch(
       </div>
     </div>
 
-    <div v-if="activeTab === 'payments'" class="rounded-xl border border-border bg-card">
+    <div v-if="activeTab === 'payments'" class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
@@ -723,7 +723,7 @@ watch(
       </div>
     </div>
 
-    <div v-if="activeTab === 'coupons'" class="rounded-xl border border-border bg-card">
+    <div v-if="activeTab === 'coupons'" class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
@@ -866,7 +866,7 @@ watch(
         </div>
       </div>
 
-      <div class="rounded-xl border border-border bg-card">
+      <div class="rounded-xl border border-border bg-card overflow-x-auto">
         <Table>
           <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
             <TableRow>

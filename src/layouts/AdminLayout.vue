@@ -40,9 +40,11 @@ import {
   Send,
   Crown,
 } from 'lucide-vue-next'
+import { Menu, X } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
 import { useAdminAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 
@@ -93,6 +95,12 @@ const authStore = useAdminAuthStore()
 const isDark = ref(false)
 const navSearch = ref('')
 const expandedGroups = ref<Record<string, boolean>>(readExpandedGroups())
+const mobileNavOpen = ref(false)
+
+// Close mobile nav on route change
+watch(() => route.path, () => {
+  mobileNavOpen.value = false
+})
 
 const navGroups = computed<NavGroup[]>(() => {
   const groups: NavGroup[] = [
@@ -513,7 +521,8 @@ onMounted(() => {
 <template>
   <div class="min-h-screen bg-background text-foreground">
     <div class="flex min-h-screen">
-      <aside class="w-64 border-r border-border bg-card flex flex-col sticky top-0 h-screen overflow-y-auto">
+      <!-- Desktop sidebar -->
+      <aside class="hidden md:flex w-64 border-r border-border bg-card flex-col sticky top-0 h-screen overflow-y-auto">
         <div class="px-6 py-6">
           <div class="text-xl font-semibold tracking-tight">
             {{ t('admin.brand') }}
@@ -589,15 +598,89 @@ onMounted(() => {
         </div>
       </aside>
 
-      <div class="flex-1">
-        <header class="flex items-center justify-between border-b border-border bg-background px-8 py-4">
-          <div class="text-sm text-muted-foreground">{{ t('admin.layout.workspace') }}</div>
+      <!-- Mobile sidebar (Sheet) -->
+      <Sheet v-model:open="mobileNavOpen">
+        <SheetContent side="left" class="w-72 p-0 flex flex-col">
+          <SheetTitle class="sr-only">{{ t('admin.layout.navigation') }}</SheetTitle>
+          <div class="px-6 py-6">
+            <div class="text-xl font-semibold tracking-tight">
+              {{ t('admin.brand') }}
+            </div>
+            <div class="text-xs text-muted-foreground mt-1">{{ t('admin.layout.controlRoom') }}</div>
+          </div>
+          <div class="px-3 pb-2">
+            <Input
+              v-model="navSearch"
+              class="h-8 text-xs"
+              :placeholder="t('admin.navSearch.placeholder')"
+            />
+          </div>
+          <nav class="px-3 pb-3 space-y-2 flex-1 overflow-y-auto">
+            <RouterLink
+              v-if="showDashboardNav"
+              to="/"
+              class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors"
+              :class="isItemActive('/') ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-secondary/70'"
+            >
+              <LayoutDashboard class="h-4 w-4 shrink-0" />
+              <span>{{ dashboardNavLabel }}</span>
+            </RouterLink>
+            <div
+              v-if="!showDashboardNav && filteredNavGroups.length === 0"
+              class="rounded-lg border border-dashed border-border px-3 py-4 text-xs text-muted-foreground"
+            >
+              {{ t('admin.navSearch.empty') }}
+            </div>
+            <div v-for="group in filteredNavGroups" :key="`mobile-${group.id}`" class="space-y-1">
+              <button
+                type="button"
+                class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors hover:bg-secondary/70"
+                :class="isGroupExpanded(group.id) ? 'bg-secondary/40 text-foreground' : 'text-foreground'"
+                @click="toggleGroup(group.id)"
+              >
+                <div class="flex min-w-0 items-center gap-3">
+                  <component :is="group.icon" class="h-4 w-4 shrink-0" />
+                  <span class="truncate">{{ group.label }}</span>
+                </div>
+                <component
+                  :is="isGroupExpanded(group.id) ? ChevronDown : ChevronRight"
+                  class="h-4 w-4 shrink-0 text-muted-foreground"
+                />
+              </button>
+              <div v-show="isGroupExpanded(group.id)" class="space-y-1 pl-9">
+                <RouterLink
+                  v-for="item in group.items"
+                  :key="`mobile-${group.id}-${item.to}`"
+                  :to="item.to"
+                  class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors"
+                  :class="isItemActive(item.to) ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:bg-secondary/70 hover:text-foreground'"
+                >
+                  <component v-if="item.icon" :is="item.icon" class="h-3.5 w-3.5 shrink-0" />
+                  <span class="truncate">{{ item.label }}</span>
+                </RouterLink>
+              </div>
+            </div>
+          </nav>
+          <div class="px-6 py-4 border-t border-border text-[11px] text-muted-foreground space-y-1">
+            <p>© {{ new Date().getFullYear() }} Dujiao-Next</p>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <div class="flex-1 flex flex-col min-w-0">
+        <header class="flex items-center justify-between border-b border-border bg-background px-4 md:px-8 py-3 md:py-4 gap-2">
+          <div class="flex items-center gap-3">
+            <Button size="icon-sm" variant="ghost" class="md:hidden" @click="mobileNavOpen = true">
+              <Menu class="h-5 w-5" />
+            </Button>
+            <div class="text-sm text-muted-foreground hidden sm:block">{{ t('admin.layout.workspace') }}</div>
+          </div>
           <div class="flex items-center gap-2">
             <Select
               :model-value="locale"
               @update:modelValue="(value) => { if (value) applyLocale(String(value)) }"
             >
-              <SelectTrigger class="h-8 w-[140px] text-xs">
+              <SelectTrigger class="h-8 w-[100px] md:w-[140px] text-xs">
                 <SelectValue :placeholder="t('admin.common.lang.zhCN')" />
               </SelectTrigger>
               <SelectContent>
@@ -612,11 +695,11 @@ onMounted(() => {
             </Button>
             <Button variant="outline" size="sm" class="gap-2" @click="handleLogout">
               <LogOut class="h-4 w-4" />
-              {{ t('admin.common.logout') }}
+              <span class="hidden sm:inline">{{ t('admin.common.logout') }}</span>
             </Button>
           </div>
         </header>
-        <main class="px-8 py-6">
+        <main class="px-4 md:px-8 py-4 md:py-6 flex-1">
           <RouterView />
         </main>
       </div>

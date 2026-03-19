@@ -267,7 +267,7 @@ onMounted(() => {
       <div>
         <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('reconciliation.columns.status') }}</label>
         <Select v-model="filters.status">
-          <SelectTrigger class="h-9 w-40">
+          <SelectTrigger class="h-9 w-full md:w-40">
             <SelectValue :placeholder="t('reconciliation.filters.allStatus')" />
           </SelectTrigger>
           <SelectContent>
@@ -280,7 +280,7 @@ onMounted(() => {
       <div>
         <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('reconciliation.columns.type') }}</label>
         <Select v-model="filters.type">
-          <SelectTrigger class="h-9 w-40">
+          <SelectTrigger class="h-9 w-full md:w-40">
             <SelectValue :placeholder="t('reconciliation.filters.allTypes')" />
           </SelectTrigger>
           <SelectContent>
@@ -293,7 +293,7 @@ onMounted(() => {
       <div>
         <label class="mb-1.5 block text-xs font-medium text-muted-foreground">{{ t('reconciliation.filters.connectionId') }}</label>
         <Select v-model="filters.connection_id">
-          <SelectTrigger class="h-9 w-48">
+          <SelectTrigger class="h-9 w-full md:w-48">
             <SelectValue :placeholder="t('reconciliation.filters.allConnections')" />
           </SelectTrigger>
           <SelectContent>
@@ -308,7 +308,7 @@ onMounted(() => {
     </div>
 
     <!-- Table -->
-    <div class="rounded-xl border border-border bg-card">
+    <div class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
@@ -510,7 +510,7 @@ onMounted(() => {
           <!-- Mismatch Items Table -->
           <div v-if="detailItems.length > 0" class="mt-6">
             <h3 class="mb-3 text-sm font-semibold">{{ t('reconciliation.items.title') }} ({{ detailItemsTotal }})</h3>
-            <div class="rounded-lg border border-border">
+            <div class="rounded-lg border border-border overflow-x-auto">
               <Table>
                 <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
                   <TableRow>

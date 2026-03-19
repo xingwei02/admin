@@ -132,7 +132,7 @@ onMounted(() => {
     </div>
 
     <Card>
-      <CardContent class="space-y-4 p-4">
+      <CardContent class="space-y-4 p-4 overflow-x-auto">
         <div class="flex flex-wrap items-center gap-3">
           <div class="w-full md:w-56">
             <Input v-model="filters.keyword" :placeholder="t('telegramBot.broadcasts.filterTitleKeyword')" @keyup.enter="handleSearch" />
@@ -230,7 +230,7 @@ onMounted(() => {
       </CardContent>
     </Card>
 
-    <div class="flex items-center justify-end gap-2">
+    <div class="flex flex-wrap items-center justify-end gap-3">
       <Button variant="outline" size="sm" :disabled="pagination.page <= 1" @click="changePage(pagination.page - 1)">
         {{ t('telegramBot.broadcasts.prevPage') }}
       </Button>

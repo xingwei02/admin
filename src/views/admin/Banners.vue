@@ -341,7 +341,7 @@ watch(
           <Input v-model="filters.search" :placeholder="t('admin.banners.searchPlaceholder')" @update:modelValue="debouncedSearch" />
         </div>
         <Select v-model="filters.position" @update:modelValue="handleSearch">
-          <SelectTrigger class="h-9 w-[220px]">
+          <SelectTrigger class="h-9 w-full md:w-[220px]">
             <SelectValue :placeholder="t('admin.banners.filters.positionPlaceholder')" />
           </SelectTrigger>
           <SelectContent>
@@ -349,7 +349,7 @@ watch(
           </SelectContent>
         </Select>
         <Select v-model="filters.isActive" @update:modelValue="handleSearch">
-          <SelectTrigger class="h-9 w-[180px]">
+          <SelectTrigger class="h-9 w-full md:w-[180px]">
             <SelectValue :placeholder="t('admin.banners.filters.statusPlaceholder')" />
           </SelectTrigger>
           <SelectContent>
@@ -359,7 +359,7 @@ watch(
       </div>
     </div>
 
-    <div class="rounded-xl border border-border bg-card">
+    <div class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
@@ -402,7 +402,7 @@ watch(
               </span>
             </TableCell>
             <TableCell class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2">
+              <div class="flex flex-wrap items-center justify-end gap-2">
                 <Button size="sm" variant="outline" @click="openEditModal(banner)">{{ t('admin.banners.actions.edit') }}</Button>
                 <Button size="sm" variant="destructive" @click="handleDelete(banner)">{{ t('admin.banners.actions.delete') }}</Button>
               </div>
@@ -436,7 +436,7 @@ watch(
 
         <form class="space-y-6" @submit.prevent="handleSubmit">
           <div class="border-b border-border">
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-4">
               <button
                 v-for="lang in languages"
                 :key="lang.code"

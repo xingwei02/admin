@@ -247,7 +247,7 @@ onMounted(() => {
       </div>
     </section>
 
-    <section class="rounded-xl border border-border bg-card overflow-hidden">
+    <section class="rounded-xl border border-border bg-card overflow-hidden overflow-x-auto">
       <Table>
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
@@ -290,7 +290,7 @@ onMounted(() => {
         </TableBody>
       </Table>
 
-      <div class="flex items-center justify-between border-t border-border px-4 py-3 text-sm text-muted-foreground">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground">
         <span>{{ pagination.page }} / {{ pagination.total_page }} · {{ pagination.total }}</span>
         <div class="flex items-center gap-2">
           <Button size="sm" variant="outline" :disabled="pagination.page <= 1" @click="changePage(pagination.page - 1)">{{ text.actions.prev }}</Button>

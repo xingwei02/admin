@@ -383,7 +383,7 @@ watch(
       </div>
     </div>
 
-    <div class="rounded-xl border border-border bg-card">
+    <div class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
@@ -527,7 +527,7 @@ watch(
               </span>
             </TableCell>
             <TableCell class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2">
+              <div class="flex flex-wrap items-center justify-end gap-2">
                 <Button size="sm" variant="outline" @click="openEditById(product.id)">{{ t('admin.products.actions.edit') }}</Button>
                 <Button size="sm" variant="destructive" @click="handleDelete(product)">{{ t('admin.products.actions.delete') }}</Button>
               </div>

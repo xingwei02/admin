@@ -246,7 +246,7 @@ onMounted(() => {
       <Button @click="openCreateModal">{{ t('siteConnections.createButton') }}</Button>
     </div>
 
-    <div class="rounded-xl border border-border bg-card">
+    <div class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
@@ -285,7 +285,7 @@ onMounted(() => {
             </TableCell>
             <TableCell class="px-6 py-4 text-xs text-muted-foreground">{{ formatTime(conn.last_ping_at) }}</TableCell>
             <TableCell class="px-6 py-4 text-right">
-              <div class="flex items-center justify-end gap-2">
+              <div class="flex flex-wrap items-center justify-end gap-2">
                 <Button size="sm" variant="outline" @click="openEditModal(conn)">{{ t('admin.common.edit') }}</Button>
                 <Button
                   size="sm"

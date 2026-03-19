@@ -811,13 +811,13 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="rounded-xl border border-border bg-card p-6">
+    <div class="rounded-xl border border-border bg-card p-4 md:p-6">
       <div class="flex flex-col gap-3 mb-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <h2 class="text-lg font-semibold text-foreground">{{ t('admin.cardSecrets.listTitle') }}</h2>
           <div class="flex flex-wrap items-center gap-3">
             <Select v-model="cardSecretStatus" @update:modelValue="refreshCardSecrets">
-              <SelectTrigger class="h-9 w-[180px] text-xs">
+              <SelectTrigger class="h-9 w-full md:w-[180px] text-xs">
                 <SelectValue :placeholder="t('admin.cardSecrets.statusAll')" />
               </SelectTrigger>
               <SelectContent>
@@ -836,7 +836,7 @@ onMounted(async () => {
             <span class="text-xs text-muted-foreground">{{ t('admin.cardSecrets.batch.selectedCount', { count: selectedSecretIds.length }) }}</span>
             <div class="flex flex-wrap items-center gap-2">
               <Select v-model="batchStatusTarget">
-                <SelectTrigger class="h-8 w-[160px] text-xs">
+                <SelectTrigger class="h-8 w-full md:w-[160px] text-xs">
                   <SelectValue :placeholder="t('admin.cardSecrets.batch.statusPlaceholder')" />
                 </SelectTrigger>
                 <SelectContent>

@@ -409,6 +409,7 @@ const messages = {
       layout: {
         controlRoom: 'Dujiao-Next Admin 控制台',
         workspace: 'Dujiao-Next Admin 后台',
+        navigation: '导航菜单',
       },
       common: {
         refresh: '刷新',
@@ -2978,6 +2979,7 @@ const messages = {
       layout: {
         controlRoom: 'Dujiao-Next Admin 控制台',
         workspace: 'Dujiao-Next Admin 後台',
+        navigation: '導航選單',
       },
       common: {
         refresh: '重新整理',
@@ -5547,6 +5549,7 @@ const messages = {
       layout: {
         controlRoom: 'Dujiao-Next Admin Control Panel',
         workspace: 'Dujiao-Next Admin Workspace',
+        navigation: 'Navigation',
       },
       common: {
         refresh: 'Refresh',

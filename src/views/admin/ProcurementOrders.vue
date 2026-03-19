@@ -514,7 +514,7 @@ onMounted(() => {
             <div class="border-b border-border bg-muted/30 px-4 py-2 text-xs font-semibold text-muted-foreground uppercase">
               {{ t('procurement.detail.orderInfo') }}
             </div>
-            <div class="grid grid-cols-2 gap-4 p-4 md:grid-cols-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 md:grid-cols-3">
               <div>
                 <div class="text-xs text-muted-foreground">{{ t('procurement.columns.localOrderNo') }}</div>
                 <div class="mt-1 text-sm font-mono font-medium">{{ detailOrder.local_order_no || '-' }}</div>

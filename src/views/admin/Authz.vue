@@ -792,7 +792,7 @@ onMounted(async () => {
       <div class="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-4">
         <div class="space-y-3">
           <Input v-model="adminKeyword" :placeholder="text.adminSearchPlaceholder" class="h-9" />
-          <div class="rounded-lg border border-border overflow-hidden">
+          <div class="rounded-lg border border-border overflow-x-auto">
             <Table>
               <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
                 <TableRow>
@@ -832,7 +832,7 @@ onMounted(async () => {
                   <TableCell class="px-4 py-3 text-xs text-muted-foreground">{{ formatDateTime(item.created_at) }}</TableCell>
                   <TableCell class="px-4 py-3 text-xs text-muted-foreground">{{ formatDateTime(item.last_login_at) }}</TableCell>
                   <TableCell class="px-4 py-3">
-                    <div class="flex items-center justify-end gap-2">
+                    <div class="flex flex-wrap items-center justify-end gap-2">
                       <Button size="sm" variant="outline" @click="pickAdminForRoles(item)">
                         {{ selectedAdminId === item.id ? text.adminRoleTargetSelected : text.adminSelectRoleTarget }}
                       </Button>
@@ -975,7 +975,7 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div class="rounded-lg border border-border overflow-hidden">
+          <div class="rounded-lg border border-border overflow-x-auto">
             <Table>
               <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
                 <TableRow>
@@ -1012,7 +1012,7 @@ onMounted(async () => {
         <h2 class="text-base font-medium">{{ text.adminRolesTitle }}</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-[320px_1fr] gap-4">
+      <div class="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
         <div class="space-y-2">
           <label class="text-sm text-muted-foreground">{{ text.adminLabel }}</label>
           <select v-model.number="selectedAdminId" class="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">

@@ -280,7 +280,7 @@ watch(
       </div>
     </div>
 
-    <div class="rounded-xl border border-border bg-card">
+    <div class="rounded-xl border border-border bg-card overflow-x-auto">
       <Table>
         <TableHeader class="bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
