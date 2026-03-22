@@ -6,7 +6,7 @@ import { notifyError, notifySuccess } from '@/utils/notify'
 const supportedLanguages = ['zh-CN', 'zh-TW', 'en-US'] as const
 type SupportedLanguage = (typeof supportedLanguages)[number]
 type LocalizedText = Record<SupportedLanguage, string>
-type MenuActionType = 'builtin' | 'url' | 'command'
+type MenuActionType = 'builtin' | 'url' | 'web_app' | 'command'
 
 interface MenuItem {
   key: string
@@ -55,7 +55,7 @@ interface TelegramBotSettingsForm {
   }
 }
 
-const menuActionTypes: MenuActionType[] = ['builtin', 'url', 'command']
+const menuActionTypes: MenuActionType[] = ['builtin', 'url', 'web_app', 'command']
 const menuItemsMaxCount = 20
 const helpItemsMaxCount = 12
 
@@ -134,7 +134,7 @@ const parseMenuItem = (raw: unknown): MenuItem => {
 
   if (obj.action && typeof obj.action === 'object' && !Array.isArray(obj.action)) {
     const action = obj.action as Record<string, unknown>
-    if (action.type === 'builtin' || action.type === 'url' || action.type === 'command') {
+    if (action.type === 'builtin' || action.type === 'url' || action.type === 'web_app' || action.type === 'command') {
       item.action.type = action.type
     }
     if (typeof action.value === 'string') {
@@ -301,6 +301,10 @@ export function useTelegramBotSettings() {
     ;[items[index], items[targetIndex]] = [items[targetIndex]!, items[index]!]
   }
 
+  const getMenuActionValuePlaceholder = (type: MenuActionType) => t(`telegramBot.settings.menuActionValuePlaceholder_${type}`)
+
+  const getMenuActionValueHint = (type: MenuActionType) => t(`telegramBot.settings.menuActionValueHint_${type}`)
+
   return {
     coverFileInput,
     currentLang,
@@ -309,6 +313,8 @@ export function useTelegramBotSettings() {
     handleUploadCover,
     addHelpItem,
     addMenuItem,
+    getMenuActionValueHint,
+    getMenuActionValuePlaceholder,
     languages,
     loading,
     menuActionTypes,

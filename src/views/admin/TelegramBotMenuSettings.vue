@@ -15,6 +15,8 @@ const {
   currentLang,
   fetchConfig,
   form,
+  getMenuActionValueHint,
+  getMenuActionValuePlaceholder,
   languages,
   loading,
   menuActionTypes,
@@ -146,7 +148,10 @@ onMounted(() => {
             </div>
             <div class="space-y-1">
               <Label>{{ t('telegramBot.settings.menuActionValue') }}</Label>
-              <Input v-model="item.action.value" :placeholder="t('telegramBot.settings.menuActionValuePlaceholder')" />
+              <Input v-model="item.action.value" :placeholder="getMenuActionValuePlaceholder(item.action.type)" />
+              <p class="text-xs text-muted-foreground">
+                {{ getMenuActionValueHint(item.action.type) }}
+              </p>
             </div>
             <div class="space-y-1">
               <Label>{{ t('telegramBot.settings.menuOrder') }}</Label>

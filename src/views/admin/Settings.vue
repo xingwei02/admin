@@ -246,6 +246,7 @@ const telegramForm = reactive({
   bot_username: '',
   bot_token: '',
   has_bot_token: false,
+  mini_app_url: '',
   login_expire_seconds: 300,
   replay_ttl_seconds: 300,
 })
@@ -470,6 +471,7 @@ const fetchSettings = async () => {
       telegramForm.bot_username = String(telegram.bot_username || '')
       telegramForm.bot_token = ''
       telegramForm.has_bot_token = !!telegram.has_bot_token
+      telegramForm.mini_app_url = String(telegram.mini_app_url || '')
       telegramForm.login_expire_seconds = normalizeNumber(telegram.login_expire_seconds, 300)
       telegramForm.replay_ttl_seconds = normalizeNumber(telegram.replay_ttl_seconds, 300)
     }
@@ -593,6 +595,7 @@ const saveTelegramAuthSettings = async () => {
   const payload: Record<string, unknown> = {
     enabled: telegramForm.enabled,
     bot_username: telegramForm.bot_username,
+    mini_app_url: telegramForm.mini_app_url,
     login_expire_seconds: Number(telegramForm.login_expire_seconds),
     replay_ttl_seconds: Number(telegramForm.replay_ttl_seconds),
   }
@@ -1026,6 +1029,13 @@ onMounted(() => {
               <Input v-model="telegramForm.bot_token" type="password" :placeholder="t('admin.settings.telegram.botTokenPlaceholder')" />
               <p class="text-xs text-muted-foreground">
                 {{ telegramForm.has_bot_token ? t('admin.settings.telegram.botTokenHintKeep') : t('admin.settings.telegram.botTokenHintEmpty') }}
+              </p>
+            </div>
+            <div class="space-y-2 md:col-span-2">
+              <label class="text-xs font-medium text-muted-foreground">{{ t('admin.settings.telegram.miniAppURL') }}</label>
+              <Input v-model="telegramForm.mini_app_url" :placeholder="t('admin.settings.telegram.miniAppURLPlaceholder')" />
+              <p class="text-xs text-muted-foreground">
+                {{ t('admin.settings.telegram.miniAppURLHint') }}
               </p>
             </div>
             <div class="space-y-2">
