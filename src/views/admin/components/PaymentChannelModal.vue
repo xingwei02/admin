@@ -2,6 +2,7 @@
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { adminAPI } from '@/api/admin'
+import { getImageUrl } from '@/utils/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -28,6 +29,7 @@ const configJsonPlaceholder = '{ "key": "value" }'
 
 const form = reactive({
   name: '',
+  icon: '',
   provider_type: 'epay',
   channel_type: 'alipay',
   interaction_mode: 'qr',
@@ -37,6 +39,39 @@ const form = reactive({
   is_active: true,
   sort_order: 10,
 })
+
+const iconFileInput = ref<HTMLInputElement | null>(null)
+const iconUploading = ref(false)
+
+const triggerIconInput = () => iconFileInput.value?.click()
+
+const handleIconFileChange = (e: Event) => {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (file) uploadIcon(file)
+}
+
+const handleIconDrop = (e: DragEvent) => {
+  const file = e.dataTransfer?.files[0]
+  if (file && file.type.startsWith('image/')) uploadIcon(file)
+}
+
+const uploadIcon = async (file: File) => {
+  iconUploading.value = true
+  const formData = new FormData()
+  formData.append('file', file)
+  try {
+    const res = await adminAPI.upload(formData, 'common')
+    form.icon = (res.data.data as Record<string, string>)?.url || ''
+  } catch {
+    error.value = t('admin.paymentChannels.modal.iconUploadFailed')
+  } finally {
+    iconUploading.value = false
+  }
+}
+
+const removeIcon = () => {
+  form.icon = ''
+}
 
 const epayConfig = reactive({
   epay_version: 'v2',
@@ -652,6 +687,7 @@ watch(
       // Create mode: reset form
       applyingChannelData.value = true
       form.name = ''
+      form.icon = ''
       form.provider_type = 'epay'
       form.channel_type = 'alipay'
       form.interaction_mode = 'qr'
@@ -669,6 +705,7 @@ watch(
         const response = await adminAPI.getPaymentChannel(id)
         const channel = response.data.data
         form.name = channel.name
+        form.icon = channel.icon || ''
         form.provider_type = channel.provider_type
         form.channel_type = channel.channel_type
         form.interaction_mode = channel.interaction_mode
@@ -765,6 +802,7 @@ const handleSubmit = async () => {
 
   const payload = {
     name: form.name,
+    icon: form.icon || '',
     provider_type: form.provider_type,
     channel_type:
       form.provider_type === 'tokenpay'
@@ -805,6 +843,25 @@ const closeModal = () => {
           <div class="min-w-0">
             <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.paymentChannels.modal.name') }}</label>
             <Input v-model="form.name" required :placeholder="t('admin.paymentChannels.modal.namePlaceholder')" />
+          </div>
+          <div class="min-w-0">
+            <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.paymentChannels.modal.icon') }}</label>
+            <div
+              class="border border-dashed border-border rounded-lg p-3 text-center cursor-pointer relative min-h-[4rem] flex items-center justify-center"
+              @click="triggerIconInput"
+              @drop.prevent="handleIconDrop"
+              @dragover.prevent
+            >
+              <input ref="iconFileInput" type="file" class="hidden" accept="image/*" @change="handleIconFileChange" />
+              <div v-if="form.icon" class="flex items-center gap-3">
+                <img :src="getImageUrl(form.icon)" class="h-10 w-10 rounded object-contain" />
+                <button type="button" class="text-xs text-destructive hover:underline" @click.stop="removeIcon">{{ t('admin.paymentChannels.modal.iconRemove') }}</button>
+              </div>
+              <div v-else class="text-muted-foreground text-xs">{{ t('admin.paymentChannels.modal.iconUploadHint') }}</div>
+              <div v-if="iconUploading" class="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg">
+                <div class="animate-spin h-5 w-5 border-b-2 border-white rounded-full"></div>
+              </div>
+            </div>
           </div>
           <div class="min-w-0">
             <label class="block text-xs font-medium text-muted-foreground mb-1.5">{{ t('admin.paymentChannels.modal.providerType') }}</label>
