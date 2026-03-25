@@ -378,6 +378,7 @@ export interface AdminPaymentChannel {
   fee_rate: number | string
   fixed_fee?: number | string
   config_json: Record<string, unknown>
+  icon: string
   is_active: boolean
   sort_order: number
   created_at: string
