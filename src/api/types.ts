@@ -31,6 +31,7 @@ export interface AdminProductSKU {
   sku_code: string
   spec_values: Record<string, string>
   price_amount: number
+  cost_price_amount: number
   manual_stock_total: number
   manual_stock_locked: number
   manual_stock_sold: number
@@ -51,6 +52,7 @@ export interface AdminProduct {
   description: LocalizedText
   content: LocalizedText
   price_amount: number
+  cost_price_amount: number
   images: string[]
   tags: string[]
   purchase_type: string
@@ -101,6 +103,7 @@ export interface AdminOrderItem {
   sku_spec_values: Record<string, string>
   quantity: number
   unit_price: number
+  cost_price: number
   total_price: number
   fulfillment_type: string
   created_at: string

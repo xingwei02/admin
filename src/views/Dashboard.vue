@@ -39,6 +39,9 @@ interface DashboardOverview {
     pending_payment_orders: number
     processing_orders: number
     gmv_paid: string
+    total_cost: string
+    total_profit: string
+    profit_margin: string
     payments_total: number
     payments_success: number
     payments_failed: number
@@ -63,6 +66,7 @@ interface DashboardTrendPoint {
   payments_success: number
   payments_failed: number
   gmv_paid: string
+  profit: string
 }
 
 interface DashboardTrends {
@@ -79,6 +83,8 @@ interface DashboardProductRanking {
   paid_orders: number
   quantity: number
   paid_amount: string
+  total_cost: string
+  profit: string
 }
 
 interface DashboardChannelRanking {
@@ -424,6 +430,33 @@ onMounted(() => {
 
       <Card class="min-w-0">
         <CardHeader class="pb-2">
+          <CardTitle class="text-xs font-medium text-muted-foreground">{{ t('admin.dashboard.kpi.totalCost') }}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="text-2xl font-semibold">{{ formatMoney(overview?.kpi.total_cost, overview?.currency) }}</div>
+        </CardContent>
+      </Card>
+
+      <Card class="min-w-0">
+        <CardHeader class="pb-2">
+          <CardTitle class="text-xs font-medium text-muted-foreground">{{ t('admin.dashboard.kpi.totalProfit') }}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="text-2xl font-semibold">{{ formatMoney(overview?.kpi.total_profit, overview?.currency) }}</div>
+        </CardContent>
+      </Card>
+
+      <Card class="min-w-0">
+        <CardHeader class="pb-2">
+          <CardTitle class="text-xs font-medium text-muted-foreground">{{ t('admin.dashboard.kpi.profitMargin') }}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="text-2xl font-semibold">{{ overview?.kpi.profit_margin ?? '0.00' }}%</div>
+        </CardContent>
+      </Card>
+
+      <Card class="min-w-0">
+        <CardHeader class="pb-2">
           <CardTitle class="text-xs font-medium text-muted-foreground">{{ t('admin.dashboard.kpi.pendingOrders') }}</CardTitle>
         </CardHeader>
         <CardContent>
@@ -509,6 +542,7 @@ onMounted(() => {
                     <div class="w-2 rounded-t bg-emerald-500/80" :style="{ height: orderPaidHeight(point.orders_paid) }" :title="`${t('admin.dashboard.trends.ordersPaid')}: ${point.orders_paid}`"></div>
                   </div>
                   <div class="text-[10px] text-muted-foreground">{{ shortDate(point.date) }}</div>
+                  <div class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400" :title="`${t('admin.dashboard.trends.profit')}: ${formatMoney(point.profit, overview?.currency)}`">{{ formatMoney(point.profit, overview?.currency) }}</div>
                 </div>
               </div>
             </div>
@@ -589,7 +623,10 @@ onMounted(() => {
                 <span>{{ t('admin.dashboard.rankings.paidOrders') }}: {{ item.paid_orders }}</span>
                 <span>{{ t('admin.dashboard.rankings.quantity') }}: {{ item.quantity }}</span>
               </div>
-              <div class="mt-1 text-xs font-semibold text-foreground">{{ t('admin.dashboard.rankings.paidAmount') }}: {{ formatMoney(item.paid_amount, overview?.currency) }}</div>
+              <div class="mt-1 flex flex-col gap-1 text-xs font-semibold text-foreground sm:flex-row sm:items-center sm:justify-between">
+                <span>{{ t('admin.dashboard.rankings.paidAmount') }}: {{ formatMoney(item.paid_amount, overview?.currency) }}</span>
+                <span>{{ t('admin.dashboard.ranking.profit') }}: {{ formatMoney(item.profit, overview?.currency) }}</span>
+              </div>
             </div>
           </div>
         </CardContent>
