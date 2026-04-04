@@ -2121,6 +2121,7 @@ const messages = {
           callbackPlaceholder: '例如 /api/custom-secret/upstream-notify',
           mustStartWithApi: '回调路由路径必须以 /api/ 开头',
           duplicatePath: '回调路由路径不能重复',
+          conflictWithSystem: '回调路由路径与系统已有路由冲突，请更换路径',
         },
         wallet: {
           title: '钱包配置',
@@ -5122,6 +5123,7 @@ const messages = {
           callbackPlaceholder: '例如 /api/custom-secret/upstream-notify',
           mustStartWithApi: '回調路由路徑必須以 /api/ 開頭',
           duplicatePath: '回調路由路徑不能重複',
+          conflictWithSystem: '回調路由路徑與系統已有路由衝突，請更換路徑',
         },
         wallet: {
           title: '錢包配置',
@@ -8123,6 +8125,7 @@ const messages = {
           callbackPlaceholder: 'e.g. /api/custom-secret/upstream-notify',
           mustStartWithApi: 'Callback route path must start with /api/',
           duplicatePath: 'Callback route paths must be unique',
+          conflictWithSystem: 'Callback route path conflicts with existing system routes, please use a different path',
         },
         wallet: {
           title: 'Wallet Config',

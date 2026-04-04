@@ -318,8 +318,13 @@ const loadCallbackRoutes = async () => {
   callbackRoutesLoaded.value = true
 }
 
+const reservedRoutePrefixes = [
+  '/api/v1/public/', '/api/v1/admin/', '/api/v1/auth/',
+  '/api/v1/guest/', '/api/v1/channel/', '/api/v1/upstream/api/', '/api/v1/user/',
+]
+
 const saveCallbackRoutes = async () => {
-  // 验证：非空值必须以 /api/ 开头
+  // 验证：非空值必须以 /api/ 开头，且不能与已有路由冲突
   const fields = [
     { key: 'payment_callback', value: callbackRoutesForm.payment_callback },
     { key: 'paypal_webhook', value: callbackRoutesForm.paypal_webhook },
@@ -328,12 +333,17 @@ const saveCallbackRoutes = async () => {
   ]
   const nonEmptyPaths: string[] = []
   for (const field of fields) {
-    const v = field.value.trim()
+    const v = field.value.trim().replace(/\/+$/, '')
     if (v && !v.startsWith('/api/')) {
       notifyError(t('admin.settings.callbackRoutes.mustStartWithApi'))
       return
     }
     if (v) {
+      const vSlash = v + '/'
+      if (reservedRoutePrefixes.some(p => vSlash.startsWith(p) || p.startsWith(vSlash))) {
+        notifyError(t('admin.settings.callbackRoutes.conflictWithSystem'))
+        return
+      }
       if (nonEmptyPaths.includes(v)) {
         notifyError(t('admin.settings.callbackRoutes.duplicatePath'))
         return
