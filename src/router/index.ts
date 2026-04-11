@@ -173,6 +173,16 @@ const routes = [
         meta: { permission: 'GET:/admin/affiliates/withdraws' },
       },
       {
+        path: 'promotion-plan',
+        name: 'promotion-plan',
+        component: () => import('@/views/promotion/PromotionPlanSetting.vue'),
+      },
+      {
+        path: 'promotion-stats',
+        name: 'promotion-stats',
+        component: () => import('@/views/promotion/PromotionStats.vue'),
+      },
+      {
         path: 'authz',
         name: 'authz',
         component: () => import('@/views/admin/Authz.vue'),
