@@ -290,6 +290,23 @@ const navGroups = computed<NavGroup[]>(() => {
       ],
     },
     {
+      id: 'promotionPlan',
+      label: t('admin.navGroups.promotionPlanManagement'),
+      icon: BadgePercent,
+      items: [
+        {
+          label: t('admin.navItems.promotionPlanSetting'),
+          to: '/promotion-plan',
+          icon: SlidersHorizontal,
+        },
+        {
+          label: t('admin.navItems.promotionStats'),
+          to: '/promotion-stats',
+          icon: ReceiptText,
+        },
+      ],
+    },
+    {
       id: 'integration',
       label: t('admin.navGroups.integrationManagement'),
       icon: Link,
