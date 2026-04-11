@@ -155,9 +155,11 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useMessage } from 'naive-ui'
 
-const message = useMessage()
+// 简化消息提示，不依赖 naive-ui
+const showMessage = (text: string, type: 'success' | 'error' = 'success') => {
+  alert(`[${type.toUpperCase()}] ${text}`)
+}
 const loading = ref(false)
 const showPreview = ref(false)
 
@@ -188,11 +190,11 @@ const handlePreview = () => {
 const handleSubmit = async () => {
   // 验证返利比例递减
   if (form.level2Rate > 0 && form.level2Rate >= form.level1Rate) {
-    message.error('二级返利比例必须小于一级')
+    showMessage('二级返利比例必须小于一级', 'error')
     return
   }
   if (form.level3Rate > 0 && form.level3Rate >= form.level2Rate) {
-    message.error('三级返利比例必须小于二级')
+    showMessage('三级返利比例必须小于二级', 'error')
     return
   }
 
@@ -205,12 +207,12 @@ const handleSubmit = async () => {
     })
 
     if (response.ok) {
-      message.success('推广方案已保存')
+      showMessage('推广方案已保存', 'success')
     } else {
-      message.error('保存失败，请重试')
+      showMessage('保存失败，请重试', 'error')
     }
   } catch (error) {
-    message.error('网络错误')
+    showMessage('网络错误', 'error')
   } finally {
     loading.value = false
   }
