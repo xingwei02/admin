@@ -1,3 +1,5 @@
+import { resolveApiBaseUrl } from './api-base'
+
 export function getImageUrl(path: string | undefined | null): string {
   if (!path) return ''
 
@@ -5,7 +7,7 @@ export function getImageUrl(path: string | undefined | null): string {
     return path
   }
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || ''
+  const apiBaseUrl = resolveApiBaseUrl()
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
 
   return `${apiBaseUrl}${normalizedPath}`

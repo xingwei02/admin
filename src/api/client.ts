@@ -1,6 +1,7 @@
 import i18n from '@/i18n'
 import type { ApiResponse } from './types'
 import { notifyError } from '@/utils/notify'
+import { resolveApiBaseUrl } from '@/utils/api-base'
 
 export type { ApiResponse }
 
@@ -17,7 +18,7 @@ const createNotifiedError = (message: string): NotifiedError => {
   return error
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+const API_BASE_URL = resolveApiBaseUrl()
 const API_PREFIX = '/api/v1'
 const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || ''
 
