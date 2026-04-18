@@ -230,20 +230,24 @@ const editDiscount = async (row: Record<string, unknown>) => {
     const response = await adminAPI.getAffiliateUserDiscount(profileID)
     const current = response.data.data || {}
     const currentRate = Number(current.discount_rate || 0)
-    const rateInput = window.prompt('请输入顶层 Token 商拿货折扣率（0-100）', String(currentRate))
+    const rateInput = window.prompt('请输入顶层 Token 商拿货折扣率（0-5）', String(currentRate))
     if (rateInput === null) return
     const discountRate = Number(rateInput)
-    if (!Number.isFinite(discountRate) || discountRate < 0 || discountRate > 100) {
-      notifyError('拿货折扣率必须在 0 到 100 之间')
+    if (!Number.isFinite(discountRate) || discountRate < 0 || discountRate > 5) {
+      notifyError('拿货折扣率必须在 0 到 5 之间')
       return
     }
+    const merchantPageEnabled = window.confirm(`是否开启“成为 Token 商人”宣传页？\n当前状态：${current.merchant_page_enabled ? '开启' : '关闭'}`)
+    const groupSectionEnabled = window.confirm(`是否显示首页底部官方群栏目？\n当前状态：${current.group_section_enabled ? '显示' : '隐藏'}`)
     await adminAPI.updateAffiliateUserDiscount(profileID, {
       discount_rate: discountRate,
+      merchant_page_enabled: merchantPageEnabled,
+      group_section_enabled: groupSectionEnabled,
     })
-    notifySuccess('顶层 Token 商拿货折扣已更新')
+    notifySuccess('顶层 Token 商折扣与页面开关已更新')
     await refreshCurrentPage()
   } catch (err: any) {
-    notifyError(err?.message || '更新顶层 Token 商拿货折扣失败')
+    notifyError(err?.message || '更新顶层 Token 商折扣配置失败')
   }
 }
 

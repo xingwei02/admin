@@ -339,7 +339,7 @@ export const adminAPI = {
   authorizeAffiliateTokenMerchant: (id: number) =>
     api.post(`/admin/affiliates/users/${id}/authorize-token-merchant`, {}),
   getAffiliateUserDiscount: (id: number) => api.get(`/admin/affiliates/users/${id}/discount`),
-  updateAffiliateUserDiscount: (id: number, data: { discount_rate: number }) =>
+  updateAffiliateUserDiscount: (id: number, data: { discount_rate: number; merchant_page_enabled?: boolean; group_section_enabled?: boolean }) =>
     api.put(`/admin/affiliates/users/${id}/discount`, data),
   getAffiliateUserContact: (id: number) => api.get(`/admin/affiliates/users/${id}/contact`),
   updateAffiliateUserContact: (id: number, data: AdminAffiliateUserContactPayload) =>
