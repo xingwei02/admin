@@ -541,6 +541,8 @@ const messages = {
       },
       nav: {
         dashboard: '仪表盘',
+        promotionPlanSetting: '推广方案设置',
+        promotionStats: '推广统计',
         products: '商品管理',
         categories: '分类管理',
         cardSecrets: '卡密库存',
@@ -574,6 +576,8 @@ const messages = {
       },
       navItems: {
         dashboard: '仪表盘',
+        promotionPlanSetting: '推广方案设置',
+        promotionStats: '推广统计',
         productCategories: '商品分类管理',
         productList: '商品列表',
         cardSecrets: '卡密库存',
@@ -3648,6 +3652,8 @@ const messages = {
       },
       navItems: {
         dashboard: '儀表板',
+        promotionPlanSetting: '推廣方案設定',
+        promotionStats: '推廣統計',
         productCategories: '商品分類管理',
         productList: '商品列表',
         cardSecrets: '卡密庫存',
@@ -6722,6 +6728,8 @@ const messages = {
       },
       navItems: {
         dashboard: 'Dashboard',
+        promotionPlanSetting: 'Promotion Plan Settings',
+        promotionStats: 'Promotion Stats',
         productCategories: 'Product Categories',
         productList: 'Product List',
         cardSecrets: 'Card Secrets',
