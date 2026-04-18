@@ -28,6 +28,6 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            xingwei02/dujiao-next-admin:latestv6
-            xingwei02/dujiao-next-admin:affiliate-v1
+            xingwei02/dujiao-next-admin:latest
+            xingwei02/dujiao-next-admin:affiliate
             xingwei02/dujiao-next-admin:${{ github.sha }}
