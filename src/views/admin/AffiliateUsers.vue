@@ -119,10 +119,18 @@ const statusClass = (status?: string) => {
 }
 
 const resolveDiscountText = (row: Record<string, any>) => {
-  const value = row?.discount?.discount_rate ?? row?.discount_rate
+  const value = row?.top_discount_rate ?? row?.discount?.discount_rate ?? row?.discount_rate
   const parsed = Number(value)
   if (!Number.isFinite(parsed)) return '-'
   return `${parsed.toFixed(2)}%`
+}
+
+const resolveIsTokenMerchant = (row: Record<string, any>) => {
+  return Boolean(row?.profile?.user?.is_token_merchant ?? row?.profile?.is_token_merchant ?? row?.is_token_merchant)
+}
+
+const resolveHasParentPromoter = (row: Record<string, any>) => {
+  return Boolean(row?.has_parent_promoter)
 }
 
 const resolveProfileID = (row: Record<string, unknown>) => Number((row?.profile as Record<string, unknown>)?.id || row?.id || 0)
@@ -214,28 +222,40 @@ const batchUpdateStatus = async (status: string) => {
 const editDiscount = async (row: Record<string, unknown>) => {
   const profileID = resolveProfileID(row)
   if (profileID <= 0) return
+  if (resolveHasParentPromoter(row as Record<string, any>)) {
+    notifyError('该会员已有上级推广员，顶层拿货折扣应由其上级推广员处理')
+    return
+  }
   try {
     const response = await adminAPI.getAffiliateUserDiscount(profileID)
     const current = response.data.data || {}
     const currentRate = Number(current.discount_rate || 0)
-    const rateInput = window.prompt('请输入客户优惠折扣率（0-5）', String(currentRate))
+    const rateInput = window.prompt('请输入顶层 Token 商拿货折扣率（0-100）', String(currentRate))
     if (rateInput === null) return
     const discountRate = Number(rateInput)
-    if (!Number.isFinite(discountRate) || discountRate < 0 || discountRate > 5) {
-      notifyError('折扣率必须在 0 到 5 之间')
+    if (!Number.isFinite(discountRate) || discountRate < 0 || discountRate > 100) {
+      notifyError('拿货折扣率必须在 0 到 100 之间')
       return
     }
-    const merchantPageEnabled = window.confirm(`客户商家页开关当前为 ${current.merchant_page_enabled ? '开启' : '关闭'}。\n点击“确定”设为开启，点击“取消”设为关闭。`)
-    const groupSectionEnabled = window.confirm(`客户群组展示开关当前为 ${current.group_section_enabled ? '开启' : '关闭'}。\n点击“确定”设为开启，点击“取消”设为关闭。`)
     await adminAPI.updateAffiliateUserDiscount(profileID, {
       discount_rate: discountRate,
-      merchant_page_enabled: merchantPageEnabled,
-      group_section_enabled: groupSectionEnabled,
     })
-    notifySuccess('Token 商客户优惠已更新')
+    notifySuccess('顶层 Token 商拿货折扣已更新')
     await refreshCurrentPage()
   } catch (err: any) {
-    notifyError(err?.message || '更新 Token 商客户优惠失败')
+    notifyError(err?.message || '更新顶层 Token 商拿货折扣失败')
+  }
+}
+
+const authorizeTokenMerchant = async (row: Record<string, unknown>) => {
+  const profileID = resolveProfileID(row)
+  if (profileID <= 0) return
+  try {
+    await adminAPI.authorizeAffiliateTokenMerchant(profileID)
+    notifySuccess('已手动授权为 Token 商')
+    await refreshCurrentPage()
+  } catch (err: any) {
+    notifyError(err?.message || '手动授权 Token 商失败')
   }
 }
 
@@ -318,7 +338,7 @@ onMounted(() => {
     </div>
 
     <div class="rounded-xl border border-border bg-card overflow-x-auto">
-      <Table class="min-w-[1220px]">
+      <Table class="min-w-[1320px]">
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
             <TableHead class="px-6 py-3">
@@ -333,7 +353,8 @@ onMounted(() => {
             <TableHead class="px-6 py-3">{{ t('admin.affiliatesUsers.table.pending') }}</TableHead>
             <TableHead class="px-6 py-3">{{ t('admin.affiliatesUsers.table.available') }}</TableHead>
             <TableHead class="px-6 py-3">{{ t('admin.affiliatesUsers.table.withdrawn') }}</TableHead>
-            <TableHead class="px-6 py-3">客户优惠</TableHead>
+            <TableHead class="px-6 py-3">拿货折扣</TableHead>
+            <TableHead class="px-6 py-3">Token 商</TableHead>
             <TableHead class="min-w-[90px] px-6 py-3">{{ t('admin.affiliatesUsers.table.status') }}</TableHead>
             <TableHead class="min-w-[140px] px-6 py-3">{{ t('admin.affiliatesUsers.table.createdAt') }}</TableHead>
             <TableHead class="min-w-[140px] px-6 py-3 text-right">{{ t('admin.affiliatesUsers.table.action') }}</TableHead>
@@ -341,12 +362,12 @@ onMounted(() => {
         </TableHeader>
         <TableBody class="divide-y divide-border">
           <TableRow v-if="loading">
-            <TableCell :colspan="14" class="p-0">
-              <TableSkeleton :columns="14" :rows="5" />
+            <TableCell :colspan="15" class="p-0">
+              <TableSkeleton :columns="15" :rows="5" />
             </TableCell>
           </TableRow>
           <TableRow v-else-if="rows.length === 0">
-            <TableCell colspan="14" class="px-6 py-8 text-center text-muted-foreground">{{ t('admin.affiliatesUsers.empty') }}</TableCell>
+            <TableCell colspan="15" class="px-6 py-8 text-center text-muted-foreground">{{ t('admin.affiliatesUsers.empty') }}</TableCell>
           </TableRow>
           <TableRow v-for="item in rows" :key="item?.profile?.id || item?.id" class="hover:bg-muted/30">
             <TableCell class="px-6 py-4">
@@ -378,6 +399,16 @@ onMounted(() => {
             <TableCell class="px-6 py-4 font-mono text-xs text-foreground">{{ pickStatAmount(item?.stats, 'AvailableCommission', 'available_commission') }}</TableCell>
             <TableCell class="px-6 py-4 font-mono text-xs text-foreground">{{ pickStatAmount(item?.stats, 'WithdrawnCommission', 'withdrawn_commission') }}</TableCell>
             <TableCell class="px-6 py-4 font-mono text-xs text-foreground">{{ resolveDiscountText(item) }}</TableCell>
+            <TableCell class="px-6 py-4 text-xs">
+              <span
+                class="inline-flex rounded-full border px-2.5 py-1 text-xs"
+                :class="resolveIsTokenMerchant(item)
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                  : 'border-zinc-200 bg-zinc-50 text-zinc-700'"
+              >
+                {{ resolveIsTokenMerchant(item) ? '是' : '否' }}
+              </span>
+            </TableCell>
             <TableCell class="min-w-[90px] px-6 py-4 text-xs">
               <span class="inline-flex rounded-full border px-2.5 py-1 text-xs" :class="statusClass(item?.profile?.status || item?.status)">
                 {{ statusLabel(item?.profile?.status || item?.status) }}
@@ -392,7 +423,16 @@ onMounted(() => {
                   :disabled="!canToggleStatus(item)"
                   @click="editDiscount(item)"
                 >
-                  折扣设置
+                  拿货折扣
+                </Button>
+                <Button
+                  v-if="!resolveIsTokenMerchant(item)"
+                  size="sm"
+                  variant="outline"
+                  :disabled="!canToggleStatus(item)"
+                  @click="authorizeTokenMerchant(item)"
+                >
+                  授权商人
                 </Button>
                 <Button
                   size="sm"
