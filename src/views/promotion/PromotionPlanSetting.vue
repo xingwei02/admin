@@ -154,7 +154,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { api } from '@/api/client'
 
 // 简化消息提示，不依赖 naive-ui
 const showMessage = (text: string, type: 'success' | 'error' = 'success') => {
@@ -183,6 +184,33 @@ const form = reactive({
   level3CondDays: 3,
 })
 
+const loadPlan = async () => {
+  try {
+    const response = await api.get('/admin/affiliate/promotion-plan')
+    const data = response.data.data
+    if (!data) return
+    Object.assign(form, {
+      level1Name: data.level_1_name || form.level1Name,
+      level1Rate: Number(data.level_1_rate ?? form.level1Rate),
+      level1CondType: data.level_1_cond_type || form.level1CondType,
+      level1CondValue: Number(data.level_1_cond_value ?? form.level1CondValue),
+      level1CondDays: Number(data.level_1_cond_days ?? form.level1CondDays),
+      level2Name: data.level_2_name || form.level2Name,
+      level2Rate: Number(data.level_2_rate ?? form.level2Rate),
+      level2CondType: data.level_2_cond_type || form.level2CondType,
+      level2CondValue: Number(data.level_2_cond_value ?? form.level2CondValue),
+      level2CondDays: Number(data.level_2_cond_days ?? form.level2CondDays),
+      level3Name: data.level_3_name || form.level3Name,
+      level3Rate: Number(data.level_3_rate ?? form.level3Rate),
+      level3CondType: data.level_3_cond_type || form.level3CondType,
+      level3CondValue: Number(data.level_3_cond_value ?? form.level3CondValue),
+      level3CondDays: Number(data.level_3_cond_days ?? form.level3CondDays),
+    })
+  } catch {
+    // 首次无数据或接口异常时保持页面默认值，不中断使用
+  }
+}
+
 const handlePreview = () => {
   showPreview.value = !showPreview.value
 }
@@ -200,23 +228,18 @@ const handleSubmit = async () => {
 
   loading.value = true
   try {
-    const response = await fetch('/api/admin/promotion-plan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-
-    if (response.ok) {
-      showMessage('推广方案已保存', 'success')
-    } else {
-      showMessage('保存失败，请重试', 'error')
-    }
+    await api.post('/admin/affiliate/promotion-plan', form)
+    showMessage('推广方案已保存', 'success')
   } catch (error) {
     showMessage('网络错误', 'error')
   } finally {
     loading.value = false
   }
 }
+
+onMounted(() => {
+  loadPlan()
+})
 </script>
 
 <style scoped>

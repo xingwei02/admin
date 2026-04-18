@@ -107,6 +107,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { api } from '@/api/client'
 
 interface Subordinate {
   id: number
@@ -152,19 +153,16 @@ const getCommissionByLevel = (level: number): number => {
 
 const loadData = async () => {
   try {
-    // 加载下级列表
-    const subResponse = await fetch('/api/admin/promotion/subordinates')
-    if (subResponse.ok) {
-      const data = await subResponse.json()
-      subordinates.value = data.data || []
-      stats.value.totalSubordinates = subordinates.value.length
-    }
+    const [subResponse, statsResponse] = await Promise.all([
+      api.get('/admin/affiliate/promotion/subordinates'),
+      api.get('/admin/affiliate/promotion/stats'),
+    ])
 
-    // 加载统计数据
-    const statsResponse = await fetch('/api/admin/promotion/stats')
-    if (statsResponse.ok) {
-      const data = await statsResponse.json()
-      stats.value = { ...stats.value, ...data.data }
+    subordinates.value = Array.isArray(subResponse.data.data) ? subResponse.data.data : []
+    stats.value = {
+      ...stats.value,
+      totalSubordinates: subordinates.value.length,
+      ...(statsResponse.data.data || {}),
     }
   } catch (error) {
     console.error('Failed to load data:', error)

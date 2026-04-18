@@ -220,6 +220,13 @@ export interface AdminAffiliateSetting {
   withdraw_channels: string[]
 }
 
+export interface AdminAffiliateUserContactPayload {
+  phone?: string
+  notice?: string
+  group_image_url?: string
+  parent_group_image_url?: string
+}
+
 export const adminAPI = {
   login: (data: AdminLoginRequest) => api.post('/admin/login', data),
   getAuthzMe: () => api.get('/admin/authz/me'),
@@ -329,6 +336,12 @@ export const adminAPI = {
     api.patch(`/admin/affiliates/users/${id}/status`, data),
   batchUpdateAffiliateUserStatus: (data: { profile_ids: number[]; status: string }) =>
     api.patch('/admin/affiliates/users/batch-status', data),
+  getAffiliateUserDiscount: (id: number) => api.get(`/admin/affiliates/users/${id}/discount`),
+  updateAffiliateUserDiscount: (id: number, data: { discount_rate: number; merchant_page_enabled: boolean; group_section_enabled: boolean }) =>
+    api.put(`/admin/affiliates/users/${id}/discount`, data),
+  getAffiliateUserContact: (id: number) => api.get(`/admin/affiliates/users/${id}/contact`),
+  updateAffiliateUserContact: (id: number, data: AdminAffiliateUserContactPayload) =>
+    api.put(`/admin/affiliates/users/${id}/contact`, data),
   getAffiliateCommissions: (params?: Record<string, unknown>) => api.get('/admin/affiliates/commissions', { params }),
   getAffiliateWithdraws: (params?: Record<string, unknown>) => api.get('/admin/affiliates/withdraws', { params }),
   rejectAffiliateWithdraw: (id: number, data: { reason?: string }) => api.post(`/admin/affiliates/withdraws/${id}/reject`, data),

@@ -118,6 +118,13 @@ const statusClass = (status?: string) => {
   return 'border-border bg-muted/30 text-muted-foreground'
 }
 
+const resolveDiscountText = (row: Record<string, any>) => {
+  const value = row?.discount?.discount_rate ?? row?.discount_rate
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed)) return '-'
+  return `${parsed.toFixed(2)}%`
+}
+
 const resolveProfileID = (row: Record<string, unknown>) => Number((row?.profile as Record<string, unknown>)?.id || row?.id || 0)
 const resolveProfileStatus = (row: Record<string, unknown>) => String((row?.profile as Record<string, unknown>)?.status || row?.status || '').trim()
 const canToggleStatus = (row: Record<string, unknown>) => resolveProfileID(row) > 0
@@ -204,6 +211,58 @@ const batchUpdateStatus = async (status: string) => {
   }
 }
 
+const editDiscount = async (row: Record<string, unknown>) => {
+  const profileID = resolveProfileID(row)
+  if (profileID <= 0) return
+  try {
+    const response = await adminAPI.getAffiliateUserDiscount(profileID)
+    const current = response.data.data || {}
+    const currentRate = Number(current.discount_rate || 0)
+    const rateInput = window.prompt('请输入客户优惠折扣率（0-5）', String(currentRate))
+    if (rateInput === null) return
+    const discountRate = Number(rateInput)
+    if (!Number.isFinite(discountRate) || discountRate < 0 || discountRate > 5) {
+      notifyError('折扣率必须在 0 到 5 之间')
+      return
+    }
+    const merchantPageEnabled = window.confirm(`客户商家页开关当前为 ${current.merchant_page_enabled ? '开启' : '关闭'}。\n点击“确定”设为开启，点击“取消”设为关闭。`)
+    const groupSectionEnabled = window.confirm(`客户群组展示开关当前为 ${current.group_section_enabled ? '开启' : '关闭'}。\n点击“确定”设为开启，点击“取消”设为关闭。`)
+    await adminAPI.updateAffiliateUserDiscount(profileID, {
+      discount_rate: discountRate,
+      merchant_page_enabled: merchantPageEnabled,
+      group_section_enabled: groupSectionEnabled,
+    })
+    notifySuccess('Token 商客户优惠已更新')
+    await refreshCurrentPage()
+  } catch (err: any) {
+    notifyError(err?.message || '更新 Token 商客户优惠失败')
+  }
+}
+
+const editGroupContent = async (row: Record<string, unknown>) => {
+  const profileID = resolveProfileID(row)
+  if (profileID <= 0) return
+  try {
+    const response = await adminAPI.getAffiliateUserContact(profileID)
+    const current = response.data.data || {}
+    const notice = window.prompt('请输入首页官方群栏目说明文案（可留空）', String(current.notice || ''))
+    if (notice === null) return
+    const groupImageUrl = window.prompt('请输入官方群主图 / 二维码图片 URL（可留空）', String(current.group_image_url || ''))
+    if (groupImageUrl === null) return
+    const parentGroupImageUrl = window.prompt('请输入官方群副图 / 引导图图片 URL（可留空）', String(current.parent_group_image_url || ''))
+    if (parentGroupImageUrl === null) return
+    await adminAPI.updateAffiliateUserContact(profileID, {
+      notice: notice.trim(),
+      group_image_url: groupImageUrl.trim(),
+      parent_group_image_url: parentGroupImageUrl.trim(),
+    })
+    notifySuccess('官方群栏目内容已更新')
+    await refreshCurrentPage()
+  } catch (err: any) {
+    notifyError(err?.message || '更新官方群栏目内容失败')
+  }
+}
+
 onMounted(() => {
   fetchRows()
 })
@@ -259,7 +318,7 @@ onMounted(() => {
     </div>
 
     <div class="rounded-xl border border-border bg-card overflow-x-auto">
-      <Table class="min-w-[1100px]">
+      <Table class="min-w-[1220px]">
         <TableHeader class="border-b border-border bg-muted/40 text-xs uppercase text-muted-foreground">
           <TableRow>
             <TableHead class="px-6 py-3">
@@ -274,6 +333,7 @@ onMounted(() => {
             <TableHead class="px-6 py-3">{{ t('admin.affiliatesUsers.table.pending') }}</TableHead>
             <TableHead class="px-6 py-3">{{ t('admin.affiliatesUsers.table.available') }}</TableHead>
             <TableHead class="px-6 py-3">{{ t('admin.affiliatesUsers.table.withdrawn') }}</TableHead>
+            <TableHead class="px-6 py-3">客户优惠</TableHead>
             <TableHead class="min-w-[90px] px-6 py-3">{{ t('admin.affiliatesUsers.table.status') }}</TableHead>
             <TableHead class="min-w-[140px] px-6 py-3">{{ t('admin.affiliatesUsers.table.createdAt') }}</TableHead>
             <TableHead class="min-w-[140px] px-6 py-3 text-right">{{ t('admin.affiliatesUsers.table.action') }}</TableHead>
@@ -281,12 +341,12 @@ onMounted(() => {
         </TableHeader>
         <TableBody class="divide-y divide-border">
           <TableRow v-if="loading">
-            <TableCell :colspan="13" class="p-0">
-              <TableSkeleton :columns="13" :rows="5" />
+            <TableCell :colspan="14" class="p-0">
+              <TableSkeleton :columns="14" :rows="5" />
             </TableCell>
           </TableRow>
           <TableRow v-else-if="rows.length === 0">
-            <TableCell colspan="13" class="px-6 py-8 text-center text-muted-foreground">{{ t('admin.affiliatesUsers.empty') }}</TableCell>
+            <TableCell colspan="14" class="px-6 py-8 text-center text-muted-foreground">{{ t('admin.affiliatesUsers.empty') }}</TableCell>
           </TableRow>
           <TableRow v-for="item in rows" :key="item?.profile?.id || item?.id" class="hover:bg-muted/30">
             <TableCell class="px-6 py-4">
@@ -317,6 +377,7 @@ onMounted(() => {
             <TableCell class="px-6 py-4 font-mono text-xs text-foreground">{{ pickStatAmount(item?.stats, 'PendingCommission', 'pending_commission') }}</TableCell>
             <TableCell class="px-6 py-4 font-mono text-xs text-foreground">{{ pickStatAmount(item?.stats, 'AvailableCommission', 'available_commission') }}</TableCell>
             <TableCell class="px-6 py-4 font-mono text-xs text-foreground">{{ pickStatAmount(item?.stats, 'WithdrawnCommission', 'withdrawn_commission') }}</TableCell>
+            <TableCell class="px-6 py-4 font-mono text-xs text-foreground">{{ resolveDiscountText(item) }}</TableCell>
             <TableCell class="min-w-[90px] px-6 py-4 text-xs">
               <span class="inline-flex rounded-full border px-2.5 py-1 text-xs" :class="statusClass(item?.profile?.status || item?.status)">
                 {{ statusLabel(item?.profile?.status || item?.status) }}
@@ -324,18 +385,36 @@ onMounted(() => {
             </TableCell>
             <TableCell class="min-w-[140px] px-6 py-4 text-xs text-muted-foreground">{{ formatDate(item?.profile?.created_at || item?.created_at) }}</TableCell>
             <TableCell class="min-w-[140px] px-6 py-4 text-right">
-              <Button
-                size="sm"
-                variant="outline"
-                :disabled="!canToggleStatus(item) || operatingProfileID === resolveProfileID(item)"
-                @click="toggleProfileStatus(item)"
-              >
-                {{
-                  resolveProfileStatus(item) === AFFILIATE_PROFILE_STATUS_ACTIVE
-                    ? t('admin.affiliatesUsers.actions.disable')
-                    : t('admin.affiliatesUsers.actions.enable')
-                }}
-              </Button>
+              <div class="flex justify-end gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  :disabled="!canToggleStatus(item)"
+                  @click="editDiscount(item)"
+                >
+                  折扣设置
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  :disabled="!canToggleStatus(item)"
+                  @click="editGroupContent(item)"
+                >
+                  群栏目内容
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  :disabled="!canToggleStatus(item) || operatingProfileID === resolveProfileID(item)"
+                  @click="toggleProfileStatus(item)"
+                >
+                  {{
+                    resolveProfileStatus(item) === AFFILIATE_PROFILE_STATUS_ACTIVE
+                      ? t('admin.affiliatesUsers.actions.disable')
+                      : t('admin.affiliatesUsers.actions.enable')
+                  }}
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         </TableBody>
