@@ -233,6 +233,18 @@ const formatLocale = (raw?: string) => {
   return map[raw] || raw
 }
 
+const handleAuthorizeTokenMerchant = async (user: AdminUser) => {
+  const confirmed = await confirmAction(`确定授权用户 ${user.email} 为 Token 商吗？`)
+  if (!confirmed) return
+  try {
+    await adminAPI.authorizeTokenMerchantByUserID(user.id)
+    // 刷新当前页，让 is_token_merchant 字段更新
+    await fetchUsers(pagination.value.page)
+  } catch (err: any) {
+    alert(err?.message || '授权 Token 商失败，请稍后重试')
+  }
+}
+
 onMounted(() => {
   fetchSiteCurrency()
   fetchUsers()
@@ -363,6 +375,14 @@ onMounted(() => {
                 </Button>
                 <Button size="sm" variant="outline" @click="openEditModal(user)">
                   {{ t('admin.users.actions.edit') }}
+                </Button>
+                <Button
+                  v-if="!(user as Record<string, unknown>).is_token_merchant"
+                  size="sm"
+                  variant="outline"
+                  @click="handleAuthorizeTokenMerchant(user)"
+                >
+                  授权Token商
                 </Button>
               </div>
             </TableCell>

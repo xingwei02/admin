@@ -338,6 +338,8 @@ export const adminAPI = {
     api.patch('/admin/affiliates/users/batch-status', data),
   authorizeAffiliateTokenMerchant: (id: number) =>
     api.post(`/admin/affiliates/users/${id}/authorize-token-merchant`, {}),
+  authorizeTokenMerchantByUserID: (userId: number) =>
+    api.post(`/admin/users/${userId}/authorize-token-merchant`, {}),
   getAffiliateUserDiscount: (id: number) => api.get(`/admin/affiliates/users/${id}/discount`),
   updateAffiliateUserDiscount: (id: number, data: { my_rate: number; merchant_page_enabled?: boolean; group_section_enabled?: boolean }) =>
     api.put(`/admin/affiliates/users/${id}/discount`, data),
