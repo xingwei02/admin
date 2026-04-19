@@ -119,8 +119,8 @@ const statusClass = (status?: string) => {
 }
 
 const resolveDiscountText = (row: Record<string, any>) => {
-  // 拿货折扣/利润上限来自 affiliate_level_schemes.my_rate
-  const value = row?.discount?.my_rate ?? row?.my_rate
+  // 拿货折扣/利润上限来自 AffiliateAdminUserItem.top_discount_rate
+  const value = row?.top_discount_rate
   const parsed = Number(value)
   if (!Number.isFinite(parsed) || parsed === 0) return '-'
   return `${parsed.toFixed(2)}%`
