@@ -298,6 +298,7 @@ export const adminAPI = {
   testNotificationCenterSettings: (data: Record<string, unknown>) => api.post('/admin/settings/notification-center/test', data),
   getAffiliateSettings: () => api.get('/admin/settings/affiliate'),
   updateAffiliateSettings: (data: AdminAffiliateSetting) => api.put('/admin/settings/affiliate', data),
+  getAffiliateLevelHealth: () => api.get('/admin/affiliate/level-health'),
   getPublicConfig: () => api.get('/public/config'),
   getImageCaptcha: () => api.get('/public/captcha/image'),
   getDashboardOverview: (params?: Record<string, unknown>) => api.get('/admin/dashboard/overview', { params }),

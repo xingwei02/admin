@@ -173,6 +173,12 @@ const routes = [
         meta: { permission: 'GET:/admin/affiliates/withdraws' },
       },
       {
+        path: 'affiliates/level-health',
+        name: 'affiliates-level-health',
+        component: () => import('@/views/admin/AffiliateLevelHealth.vue'),
+        meta: { permission: 'GET:/admin/affiliate/level-health' },
+      },
+      {
         path: 'promotion-plan',
         name: 'promotion-plan',
         component: () => import('@/views/promotion/PromotionPlanSetting.vue'),
